@@ -31,7 +31,12 @@ const addDevMiddlewares = (app, webpackConfig) => {
     });
   }
 
-  app.get('*', (req, res) => {
+  app.get('*', (req, res, next) => {
+    if ( req.url.includes( '/api' ) ) {
+      next();
+      return;
+    }
+
     fs.readFile(path.join(compiler.outputPath, 'index.html'), (err, file) => {
       if (err) {
         res.sendStatus(404);

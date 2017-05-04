@@ -10,15 +10,17 @@
  */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
 
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+import Footer from '../../components/Footer';
+
+class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <h1>
-        <FormattedMessage {...messages.header} />
+        <Footer title="Im A footer dope" />
       </h1>
     );
   }
 }
+
+export default HomePage;

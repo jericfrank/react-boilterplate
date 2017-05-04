@@ -9,6 +9,9 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ngrok = (isDev && process.env.ENABLE_TUNNEL) || argv.tunnel ? require('ngrok') : false;
 const resolve = require('path').resolve;
 const app = express();
+const fetch   = require( 'request' );
+
+const config = require( './config' );
 
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 // app.use('/api', myApi);
@@ -18,6 +21,30 @@ setup(app, {
   outputPath: resolve(process.cwd(), 'build'),
   publicPath: '/',
 });
+
+app.use( ( request, response ) => {
+  let proxy;
+  if ( process.env.IP ) {
+    proxy = `http://${process.env.IP}`;
+  } else {
+    proxy = config.api.url;
+  }
+
+  const url = proxy + request.path;
+
+  console.log( 'Proxy call:', url ); // eslint-disable-line no-console
+
+  request.pipe( fetch( {
+    url,
+    method : request.method,
+    qs     : request.query,
+    json   : true
+  }, ( error ) => {
+    if ( error ) {
+      console.log( `Caught unhandled stream error in pipe ${error}` ); // eslint-disable-line no-console
+    }
+  } ) ).pipe( response );
+} );
 
 // get the intended host and port number, use localhost and port 3000 if not provided
 const customHost = argv.host || process.env.HOST;
