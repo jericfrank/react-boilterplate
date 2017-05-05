@@ -10,3 +10,11 @@
  */
 
 export const DEFAULT_LOCALE = 'en';
+
+export const SIDE_NAVS = [ {
+  name  : 'Home',
+  path  : '/'
+}, {
+  name  : 'Users',
+  path  : '/users'
+} ];

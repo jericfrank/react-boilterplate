@@ -11,13 +11,11 @@
 
 import React from 'react';
 
-import Footer from '../../components/Footer';
-
 class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <h1>
-        <Footer title="Im A footer dope" />
+        HomePage
       </h1>
     );
   }

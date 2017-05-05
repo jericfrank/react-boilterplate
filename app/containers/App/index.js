@@ -11,19 +11,65 @@
  * the linting exception.
  */
 
-import React from 'react';
+import React, { PropTypes } from 'react';
+import { Grid, Col, Row } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
-export default class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+import NavBar from '../../components/NavBar';
+
+import { SIDE_NAVS } from './constants';
+
+import {
+  selectIsAuthenticated
+} from './selectors';
+
+class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     children: React.PropTypes.node,
   };
 
+  renderNavBars() {
+    const { isAuthenticated } = this.props;
+
+    if( isAuthenticated ) {
+      return (
+        <NavBar navs={SIDE_NAVS} />
+      );
+    }
+
+    return null;
+  }
+
   render() {
     return (
       <div>
-        {React.Children.toArray(this.props.children)}
+        {this.renderNavBars()}
+        <Grid>
+          <Row className="show-grid">
+            <Col xs={12}>
+              {React.Children.toArray(this.props.children)}
+            </Col>
+          </Row>
+        </Grid>
       </div>
     );
   }
 }
+
+App.propTypes = {
+  isAuthenticated : PropTypes.bool
+};
+
+const mapStateToProps = createStructuredSelector( {
+  isAuthenticated : selectIsAuthenticated()
+});
+
+export function mapDispatchToProps ( dispatch ) {
+  return {
+    dispatch
+  };
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )( App );
