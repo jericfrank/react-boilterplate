@@ -4,12 +4,18 @@
 // about the code splitting business
 import { getAsyncInjectors } from 'utils/asyncInjectors';
 
+import AuthMiddleware from './components/Middleware/auth';
+
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
 };
 
-const loadModule = (cb) => (componentModule) => {
-  cb(null, componentModule.default);
+const loadModule = (cb, hoc) => (componentModule) => {
+  if ( hoc ) {
+    cb( null, hoc( componentModule.default ) );
+  } else {
+    cb( null, componentModule.default );
+  }
 };
 
 export default function createRoutes(store) {
@@ -25,7 +31,7 @@ export default function createRoutes(store) {
           import('containers/HomePage')
         ]);
 
-        const renderRoute = loadModule(cb);
+        const renderRoute = loadModule(cb, AuthMiddleware);
 
         importModules.then(([component]) => {
           renderRoute(component);
@@ -43,7 +49,7 @@ export default function createRoutes(store) {
           import('containers/UsersPage'),
         ]);
 
-        const renderRoute = loadModule(cb);
+        const renderRoute = loadModule(cb, AuthMiddleware);
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('usersPage', reducer.default);

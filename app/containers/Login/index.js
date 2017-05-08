@@ -9,9 +9,32 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import makeSelectLogin from './selectors';
+import { Field, reduxForm } from 'redux-form/immutable';
+import _ from 'lodash';
+
+import { FIELDS } from './constants';
 
 export class Login extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  renderField ( field, key ) {
+    return (
+      <Field
+        placeholder={key}
+        key={key}
+        name={key}
+        type={field.type}
+        component="input"
+        className="margin-left-10 margin-right-10"
+      />
+    );
+  }
+
   render() {
+    const form = (
+      <form>
+        { _.map( FIELDS, this.renderField )}
+      </form>
+    );
+
     return (
       <div>
         <Helmet
@@ -20,7 +43,7 @@ export class Login extends React.PureComponent { // eslint-disable-line react/pr
             { name: 'description', content: 'Description of Login' },
           ]}
         />
-        <h1>Im a login.</h1>
+        {form}
       </div>
     );
   }
@@ -39,5 +62,9 @@ function mapDispatchToProps(dispatch) {
     dispatch,
   };
 }
+
+Login = reduxForm( { // eslint-disable-line no-class-assign
+  form : 'login'
+} )( Login );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
