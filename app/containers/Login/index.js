@@ -14,6 +14,7 @@ import _ from 'lodash';
 
 import { loginSubmit } from './actions';
 import { FIELDS } from './constants';
+import validate from './validate';
 
 export class Login extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor () {
@@ -32,14 +33,24 @@ export class Login extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   renderField ( field, key ) {
+    const renderField = ({ input, placeholder, label, type, meta: { touched, error } }) => (
+      <div>
+        <label>{label}</label>
+        <div>
+          <input {...input} type={type} placeholder={placeholder}/>
+          {touched && error && <span>{error}</span>}
+        </div>
+      </div>
+    );
+
     return (
       <Field
         placeholder={key}
         key={key}
         name={key}
         type={field.type}
-        component="input"
-        className="margin-left-10 margin-right-10"
+        component={renderField}
+        className=""
       />
     );
   }
@@ -91,7 +102,8 @@ Login.propTypes = {
 };
 
 Login = reduxForm( { // eslint-disable-line no-class-assign
-  form : 'login'
+  form : 'login',
+  validate
 } )( Login );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
