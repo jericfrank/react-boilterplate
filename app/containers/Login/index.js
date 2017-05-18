@@ -8,13 +8,29 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
-import makeSelectLogin from './selectors';
+import { makeSelectLoginError, makeSelectLogin, makeSelectLoggingIn } from './selectors';
 import { Field, reduxForm } from 'redux-form/immutable';
 import _ from 'lodash';
 
+import { loginSubmit } from './actions';
 import { FIELDS } from './constants';
 
 export class Login extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor () {
+    super();
+
+    this.handleFormSubmit = this.handleFormSubmit.bind( this );
+  }
+
+  handleFormSubmit ( values ) {
+    const user = {
+      username : values.get( 'username' ),
+      password : values.get( 'password' )
+    };
+
+    this.props.loginSubmit( user );
+  }
+
   renderField ( field, key ) {
     return (
       <Field
@@ -29,9 +45,12 @@ export class Login extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   render() {
+    const { handleSubmit, loggingIn, errorMsg } = this.props;
+
     const form = (
-      <form>
+      <form onSubmit={ handleSubmit(this.handleFormSubmit) }>
         { _.map( FIELDS, this.renderField )}
+        <input type="submit" />
       </form>
     );
 
@@ -43,7 +62,8 @@ export class Login extends React.PureComponent { // eslint-disable-line react/pr
             { name: 'description', content: 'Description of Login' },
           ]}
         />
-        {form}
+        {errorMsg ? errorMsg : ''}
+        {loggingIn ? 'logging in..' : form}
       </div>
     );
   }
@@ -54,14 +74,21 @@ Login.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  Login: makeSelectLogin(),
+  login: makeSelectLogin(),
+  loggingIn: makeSelectLoggingIn(),
+  errorMsg: makeSelectLoginError()
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch,
+    loginSubmit : ( user ) => dispatch( loginSubmit( user ) )
   };
 }
+
+Login.propTypes = {
+  loginSubmit  : React.PropTypes.func,
+  handleSubmit : React.PropTypes.func
+};
 
 Login = reduxForm( { // eslint-disable-line no-class-assign
   form : 'login'
